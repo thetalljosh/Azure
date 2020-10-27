@@ -121,28 +121,53 @@
         }
     },
     "variables": {
-        "subnetRef": "[resourceId(parameters('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVirtualNetworkName'),  parameters('subnetName'))]"
+        "subnetRef": "[resourceId(parameters('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVirtualNetworkName'),  parameters('subnetName'))]",
+		"imagename": "SEC-LAN_Windows10_Baseline"
     },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('storageAccountName'), copyIndex(100))]",
+            "name": "[concat(parameters('storageAccountName'), copyIndex(101))]",
             "location": "[parameters('location')]",
             "sku": {
                 "name": "Standard_LRS"
             },
             "kind": "Storage",
-            "properties": {},
+            "properties": {
+                "ipRules": [
+                    {
+                        "value": "string",
+                        "action": "Allow"
+                    }
+                ]
+            },
             "copy": {
                 "name": "storageCopy",
                 "count": "[parameters('copyCount')]"
             }
         },
+		 {
+            "type": "Microsoft.Compute/images",
+            "apiVersion": "2019-12-01",
+            "name": "[variables('imageName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "storageProfile": {
+                    "osDisk": {
+                        "osType": "Windows",
+                        "osState": "Generalized",
+                        "blobUri": "/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/RG-DEMO-VDI/providers/Microsoft.Compute/disks/azurw4fh11wk101_OsDisk_1_122dd99e240243779123974e84ac893b",
+                        "storageAccountType": "Standard_LRS"
+                    }
+                },
+                "hyperVGeneration": "V2"
+            }
+        },
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('nicName'), copyIndex(100), '_')]",
+            "name": "[concat(parameters('nicName'), copyIndex(101), '_')]",
             "location": "[parameters('location')]",
             "properties": {
                 "ipConfigurations": [
@@ -165,67 +190,56 @@
         {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2018-10-01",
-            "name": "[concat(parameters('dnsLabelPrefix'), copyIndex(100))]",
+            "name": "[concat(parameters('dnsLabelPrefix'), copyIndex(101))]",
             "location": "[parameters('location')]",
-            "copy": {
-                "name": "vmCopy",
-                "count": "[parameters('copyCount')]"
-            },
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[concat(parameters('dnsLabelPrefix'), copyIndex(100))]",
+                    "computerName": "[concat(parameters('dnsLabelPrefix'), copyIndex(101))]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
-                "storageProfile": {
+                 "storageProfile": {
                     "imageReference": {
-                        "publisher": "MicrosoftWindowsDesktop",
-                        "offer": "windows-10",
-                        "sku": "[parameters('windowsOSVersion')]",
-                        "version": "latest"
-                    },
+                        "id": "[resourceId('Microsoft.Compute/images', variables('imageName'))]"
+                    }
+                },
                     "osDisk": {
-                        "createOption": "FromImage"
-                    },
-                    "dataDisks": [
-                        {
-                            "diskSizeGB": 256,
-                            "lun": 0,
-                            "createOption": "Empty"
-                        }
-                    ]
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS"
+                        },
+                        "diskSizeGB": 256
+                    }
                 },
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('nicName'),copyIndex(100),'_'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('nicName'),copyIndex(101),'_'))]"
                         }
                     ]
                 },
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('storageAccountName'), copyIndex(100)))).primaryEndpoints.blob]"
+                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('storageAccountName'), copyIndex(101)))).primaryEndpoints.blob]"
                     }
-                }
-            }
-
-        },
-        {
+                },
             
             "copy": {
-                "name": "DomainJoinCopy",
+                "name": "vmCopy",
                 "count": "[parameters('copyCount')]"
-            },
+            }
+        },
+        {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('dnsLabelPrefix'),copyIndex(100),'/joindomain')]",
-            "location": "[parameters('location')]",
             "apiVersion": "2019-07-01",
+            "name": "[concat(parameters('dnsLabelPrefix'),copyIndex(101),'/joindomain')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/',parameters('dnsLabelPrefix'), copyIndex(100))]"
+                "[concat('Microsoft.Compute/virtualMachines/',parameters('dnsLabelPrefix'), copyIndex(101))]"
             ],
             "properties": {
                 "publisher": "Microsoft.Compute",
@@ -242,38 +256,10 @@
                 "protectedSettings": {
                     "Password": "[parameters('domainPassword')]"
                 }
-            }
-        },
-        {
-             "copy": {
-                "name": "DSCCopy",
-                "count": "[parameters('copyCount')]"
             },
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2018-06-01",
-            "name": "[concat(parameters('dnsLabelPrefix'),copyIndex(100),'/DSC')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/',parameters('dnsLabelPrefix'), copyIndex(100))]"
-            ],
-            "properties": {
-                "publisher": "Microsoft.Powershell",
-                "type": "DSC",
-                "typeHandlerVersion": "2.77",
-                "protectedSettings": {
-                    "configurationArguments": {
-                        "RegistrationKey": {
-                            "UserName": "PLACEHOLDER_DONOTUSE",
-                            "Password": "[listKeys(resourceId(parameters('automationAccountResourceGroup'), 'Microsoft.Automation/automationAccounts',parameters('automationAccountName')), '2018-01-15').Keys[0].value]"
-                        }
-                    }
-                },
-                "settings": {
-                    "configurationArguments": {
-                        "RegistrationUrl": "[reference(resourceId(parameters('automationAccountResourceGroup'), 'Microsoft.Automation/automationAccounts', parameters('automationAccountName')), '2018-01-15').registrationUrl]",
-                        "NodeConfigurationName": "[parameters('nodeConfigurationName')]"
-                    }
-                }
+            "copy": {
+                "name": "DomainJoinCopy",
+                "count": "[parameters('copyCount')]"
             }
         }
     ]
