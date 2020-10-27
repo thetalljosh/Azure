@@ -1,66 +1,63 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "nicName": {
-            "value": "rgdemonic_"
-        },
-        "storageAccountName": {
-            "value": "rgstor"
-        },
-        "existingVirtualNetworkName": {
-            "value": "SEC-vNet-01"
-        },
-        "copyCount": {
-            "value": 5
-        },
-        "automationAccountResourcegroup": {
-            "value": "RG-SEC-LAN-Automation"
-        },
-        "nodeConfigurationName": {
-            "value": "Windows10_STIG.localhost"
-        },
-        "automationAccountName": {
-            "value": "SEC-LAN-Automation-01"
-        },
-        "existingVirtualNetworkResourceGroup": {
-            "value": "RG-SEC-DREN-Network-01"
-        },
-        "subnetName": {
-            "value": "VDI-Subnet-01"
-        },
-        "adminUsername": {
-            "value": "SECLAN001"
-        },
-        "adminPassword": {
-            "value": "null"
-        },
-        "windowsOSVersion": {
-            "value": "20h1-ent"
-        },
-        "vmSize": {
-            "value": "Standard_B4ms"
-        },
-        "location": {
-            "value": "usgovvirginia"
-        },
-        "domainToJoin": {
-            "value": "SEC.Local"
-        },
-        "domainUsername": {
-            "value": "Joshua.lambert.da"
-        },
-        "dnsLabelPrefix": {
-            "value": "azurw4fh11wk"
-        },
-        "domainPassword": {
-            "value": "null"
-        },
-        "ouPath": {
-            "value": "OU=Azure,OU=Workstations,OU=ITSB,OU=SEC,DC=SEC,DC=local"
-        },
-        "domainJoinOptions": {
-            "value": 3
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "nicName": {
+      "value": "rgdemonic_"
+    },
+    "storageAccountName": {
+      "value": "rgstor"
+    },
+    "existingVirtualNetworkName": {
+      "value": "SEC-vNet-01"
+    },
+    "automationAccountResourcegroup": {
+      "value": "RG-SEC-LAN-Automation"
+    },
+    "nodeConfigurationName": {
+      "value": "Windows10_STIG.localhost"
+    },
+    "automationAccountName": {
+      "value": "SEC-LAN-Automation-01"
+    },
+    "existingVirtualNetworkResourceGroup": {
+      "value": "RG-SEC-DREN-Network-01"
+    },
+    "subnetName": {
+      "value": "VDI-Subnet-01"
+    },
+    "adminUsername": {
+      "value": "SECLAN001"
+    },
+    "adminPassword": {
+      "value": null
+    },
+    "windowsOSVersion": {
+      "value": "20h1-ent"
+    },
+    "vmSize": {
+      "value": "Standard_B4ms"
+    },
+    "location": {
+      "value": "usgovvirginia"
+    },
+    "domainToJoin": {
+      "value": "SEC.Local"
+    },
+    "domainUsername": {
+      "value": "Joshua.lambert.da"
+    },
+    "dnsLabelPrefix": {
+      "value": "azurw4fh11wk"
+    },
+    "domainPassword": {
+      "value": null
+    },
+    "ouPath": {
+      "value": "OU=Azure,OU=Workstations,OU=ITSB,OU=SEC,DC=SEC,DC=local"
+    },
+    "domainJoinOptions": {
+      "value": 3
     }
+  }
 }
