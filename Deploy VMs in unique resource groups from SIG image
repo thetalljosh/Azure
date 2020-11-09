@@ -1,0 +1,289 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subnetID": {
+            "type": "string"
+        },
+        "nicName": {
+            "type": "String"
+        },
+        "rgNamePrefix": {
+            "type": "string"
+        },
+        "rgLocation": {
+            "type": "string"
+        },
+        "storageAccountName": {
+            "defaultValue": "rgdemostor",
+            "type": "String"
+        },
+        "existingVirtualNetworkName": {
+            "type": "String",
+            "metadata": {
+                "description": "Name of the existing VNET"
+            }
+        },
+        "copyCount": {
+            "type": "Int",
+            "metadata": {
+                "description": "number of resource copies to make with copyindex loops"
+            }
+        },
+        "automationAccountResourcegroup": {
+            "type": "String"
+        },
+        "nodeConfigurationName": {
+            "type": "String"
+        },
+        "automationAccountName": {
+            "type": "String"
+        },
+        "existingVirtualNetworkResourceGroup": {
+            "defaultValue": "[resourceGroup().name]",
+            "type": "String",
+            "metadata": {
+                "description": "Name of the existing VNET resource group"
+            }
+        },
+        "subnetName": {
+            "type": "String",
+            "metadata": {
+                "description": "Name of the subnet in the virtual network you want to use"
+            }
+        },
+        "adminUsername": {
+            "type": "String",
+            "metadata": {
+                "description": "Username for the Virtual Machine."
+            }
+        },
+        "adminPassword": {
+            "type": "SecureString",
+            "metadata": {
+                "description": "Password for the Virtual Machine."
+            }
+        },
+        "windowsOSVersion": {
+            "defaultValue": "20h1-ent",
+            "allowedValues": [
+                "20h1-ent",
+                "2016-Datacenter",
+                "2019-Datacenter"
+            ],
+            "type": "String",
+            "metadata": {
+                "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+            }
+        },
+        "vmSize": {
+            "defaultValue": "Standard_B4ms",
+            "type": "String",
+            "metadata": {
+                "description": "Size of the virtual machine."
+            }
+        },
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "type": "String",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "domainToJoin": {
+            "type": "String",
+            "metadata": {
+                "description": "The FQDN of the AD domain"
+            }
+        },
+        "domainUsername": {
+            "type": "String",
+            "metadata": {
+                "description": "Username of the account on the domain"
+            }
+        },
+        "dnsLabelPrefix": {
+            "type": "String",
+            "metadata": {
+                "description": "Unique public DNS prefix for the deployment. The fqdn will look something like '<dnsname>.westus.cloudapp.azure.com'. Up to 62 chars, digits or dashes, lowercase, should start with a letter: must conform to '^[a-z][a-z0-9-]{1,61}[a-z0-9]$'."
+            }
+        },
+        "domainPassword": {
+            "type": "SecureString",
+            "metadata": {
+                "description": "Password of the account on the domain"
+            }
+        },
+        "ouPath": {
+            "defaultValue": "",
+            "type": "String",
+            "metadata": {
+                "description": "Specifies an organizational unit (OU) for the domain account. Enter the full distinguished name of the OU in quotation marks. Example: \"OU=testOU; DC=domain; DC=Domain; DC=com\""
+            }
+        },
+        "domainJoinOptions": {
+            "defaultValue": 3,
+            "type": "Int",
+            "metadata": {
+                "description": "Set of bit flags that define the join options. Default value of 3 is a combination of NETSETUP_JOIN_DOMAIN (0x00000001) & NETSETUP_ACCT_CREATE (0x00000002) i.e. will join the domain and create the account on the domain. For more information see https://msdn.microsoft.com/en-us/library/aa392154(v=vs.85).aspx"
+            }
+        },
+        "galleryName": {
+            "type": "string"
+
+        },
+        "galleryImageDefinitionName": {
+            "type": "string"
+        },
+        "galleryImageVersionName": {
+            "type" : "string"
+        }
+
+
+    },
+    "variables": {
+
+        "imagename": "SEC-LAN_Windows10_Baseline",
+        "imageID": "/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/RG-Demo-VDI/providers/Microsoft.Compute/images/SEC-LAN_Windows10_Baseline",
+        "rgName": "[concat(parameters('rgNamePrefix'),parameters('dnsLabelPrefix'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(variables('rgName'),copyindex(102))]",
+            "location": "[parameters('rgLocation')]",
+            "properties": {},
+            "copy": {
+                "name": "ResourceGroupCopy",
+                "count": "[parameters('copyCount')]"
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-06-01",
+            "resourceGroup": "[concat(variables('rgName'),copyindex(102))]",
+            "name": "[concat('vmDeployment',copyindex(102))]",
+
+            "copy": {
+                "name": "DeploymentCopy",
+                "count": "[parameters('copyCount')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups/', concat(variables('rgName'),copyindex(102)))]"
+            ],
+            "properties": {
+
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.Storage/storageAccounts",
+                            "apiVersion": "2018-11-01",
+                            "name": "[concat(parameters('storageAccountName'), copyindex(102))]",
+                            "location": "[parameters('location')]",
+
+                            "sku": {
+                                "name": "Standard_LRS"
+                            },
+                            "kind": "Storage",
+                            "properties": {
+                                "ipRules": [
+                                    {
+                                        "value": "string",
+                                        "action": "Allow"
+                                    }
+                                ]
+                            }
+
+                        },
+                        
+                        {
+                            "type": "Microsoft.Network/networkInterfaces",
+                            "apiVersion": "2018-11-01",
+                            "name": "[concat(parameters('nicName'), copyindex(102), '_')]",
+                            "location": "[parameters('location')]",
+                            "properties": {
+                                "ipConfigurations": [
+                                    {
+                                        "name": "[concat(parameters('nicName'), copyindex(102), '_', 'IP')]",
+                                        "properties": {
+                                            "privateIPAllocationMethod": "Dynamic",
+                                            "subnet": {
+                                                "id": "/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/RG-SEC-DREN-Network-01/providers/Microsoft.Network/virtualNetworks/SEC-vNet-01/subnets/VDI-Subnet-01"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+
+                        },
+                        {
+                            "type": "Microsoft.Compute/virtualMachines",
+                            "apiVersion": "2018-10-01",
+                            "name": "[concat(parameters('dnsLabelPrefix'), copyindex(102))]",
+                            "location": "[parameters('location')]",
+
+                            "properties": {
+                                "hardwareProfile": {
+                                    "vmSize": "[parameters('vmSize')]"
+                                },
+                                "osProfile": {
+                                    "computerName": "[concat(parameters('dnsLabelPrefix'), copyindex(102))]",
+                                    "adminUsername": "[parameters('adminUsername')]",
+                                    "adminPassword": "[parameters('adminPassword')]"
+                                },
+                                "storageProfile": {
+                                    "imageReference": {
+                                        "id": "/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/RG-SEC-SIG/providers/Microsoft.Compute/galleries/SECGeneralizedSIG/images/Windows10_Baseline/versions/1.0.0"
+                                    }
+                                },
+
+                                
+                            
+
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id":"[concat('/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/','RG-',parameters('dnsLabelPrefix'), copyindex(102),'/providers/Microsoft.Network/networkInterfaces/', parameters('nicName'), copyindex(102), '_')]"
+                                    }
+                                ]
+                            }
+                            }
+
+                },
+
+
+
+                {
+                    "type": "Microsoft.Compute/virtualMachines/extensions",
+                    "apiVersion": "2019-07-01",
+                    "name": "[concat(parameters('dnsLabelPrefix'),copyindex(102),'/joindomain')]",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/',parameters('dnsLabelPrefix'), copyindex(102))]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "JsonADDomainExtension",
+                        "typeHandlerVersion": "1.3",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "Name": "[parameters('domainToJoin')]",
+                            "OUPath": "[parameters('ouPath')]",
+                            "User": "[concat(parameters('domainToJoin'), '\\', parameters('domainUsername'))]",
+                            "Restart": "true",
+                            "Options": "[parameters('domainJoinOptions')]"
+                        },
+                        "protectedSettings": {
+                            "Password": "[parameters('domainPassword')]"
+                        }
+                    }
+
+                }
+    ]
+} } } ] }
