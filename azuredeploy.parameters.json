@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "nicName": {
@@ -30,7 +30,10 @@
       "value": "SECLAN001"
     },
     "adminPassword": {
-      "value": null
+      "value": ""
+    },
+    "copyCount": {
+        "value": 4
     },
     "windowsOSVersion": {
       "value": "20h1-ent"
@@ -51,13 +54,31 @@
       "value": "azurw4fh11wk"
     },
     "domainPassword": {
-      "value": null
+      "value": ""
     },
     "ouPath": {
       "value": "OU=Azure,OU=Workstations,OU=ITSB,OU=SEC,DC=SEC,DC=local"
     },
+    "rgLocation": {
+        "value": "usgovvirginia"
+    },
+    "rgNamePrefix": {
+        "value": "RG-" 
+    },
     "domainJoinOptions": {
       "value": 3
+    },
+    "subnetID": {
+        "value": "VDI-Subnet-01" 
+    },
+    "galleryImageDefinitionName": {
+        "value": "Windows10_Baseline"
+    },
+    "galleryImageVersionName": {
+        "value": "1.0.0"
+    },
+    "galleryName": {
+        "value": "SecGeneralizedSIG"
     }
   }
 }
