@@ -1,0 +1,12 @@
+#Set the template file and template parameter file paths and paste in to Az powershell. Enter the admin password of your choosing for the new VMs, and your domain-join-capable user account and password for automated domain join
+
+New-AzDeployment `
+Name DeployLocalTestTemplate `
+TemplateFile "\\fs\Share02\Automation-Resources\Azure\ARM Templates\deployMultipleVM_NewResourceGroups_FromImage.json" `
+-TemplateParameterFile "\\fs\Share02\Automation-Resources\Azure\ARM Templates\azuredeploy.parameters.json" `
+-domainAccount "USERNAME" `
+-adminPassword (ConvertTo-SecureString "PASSWORD" -asplaintext -force) `
+-domainPassword (ConvertTo-SecureString "PASSWORD" -asplaintext -force) `
+-Location usgovvirginia `
+-DeploymentDebugLogLevel All `
+-verbose 
