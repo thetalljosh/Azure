@@ -182,7 +182,8 @@
                                     "osDisk": {
                                         "ManagedDisk": {
                                             "storageAccountType": "StandardSSD_LRS"
-                                            }
+                                            },
+                                        "createOption": "FromImage"
                                         }
                                 },
 
