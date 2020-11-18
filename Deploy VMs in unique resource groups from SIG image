@@ -240,7 +240,12 @@
                                 "storageProfile": {
                                     "imageReference": {
                                         "id": "/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/RG-SEC-SIG/providers/Microsoft.Compute/galleries/SECGeneralizedSIG/images/Windows10_Baseline/versions/1.0.0"
-                                    }
+                                    },
+                                    "osDisk": {
+                                        "ManagedDisk": {
+                                            "storageAccountType": "StandardSSD_LRS"
+                                            }
+                                        }
                                 },
 
                                 
