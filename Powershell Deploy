@@ -1,3 +1,5 @@
+#Set the template file and template parameter file paths and paste in to Az powershell. Enter the admin password of your choosing for the new VMs, and your domain-join-capable user account and password for automated domain join
+
 
 #Provides Dialog Box to select a file with list of computers.  File must contain only 1 of each of the Computer name(s) per line
 Function Get-OpenFile($initialDirectory)
