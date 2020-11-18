@@ -232,6 +232,7 @@
                                 "hardwareProfile": {
                                     "vmSize": "[parameters('vmSize')]"
                                 },
+                                "licenseType": "Windows_Client",
                                 "osProfile": {
                                     "computerName": "[concat(parameters('dnsLabelPrefix'), copyindex(102))]",
                                     "adminUsername": "[parameters('adminUsername')]",
