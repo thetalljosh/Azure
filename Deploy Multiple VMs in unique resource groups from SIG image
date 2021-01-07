@@ -87,6 +87,10 @@
             "metadata": {
                 "description": "Set of bit flags that define the join options. Default value of 3 is a combination of NETSETUP_JOIN_DOMAIN (0x00000001) & NETSETUP_ACCT_CREATE (0x00000002) i.e. will join the domain and create the account on the domain. For more information see https://msdn.microsoft.com/en-us/library/aa392154(v=vs.85).aspx"
             }
+        },
+        "copyIndexNumber": {
+            "defaultValue": "",
+            "type": "int"
         }
         
 
@@ -102,7 +106,7 @@
         {
             "type": "Microsoft.Resources/resourceGroups",
             "apiVersion": "2020-06-01",
-            "name": "[concat(variables('rgName'),copyindex(102))]",
+            "name": "[concat(variables('rgName'),copyindex(parameters('copyIndexNumber')))]",
             "location": "[parameters('rgLocation')]",
             "properties": {},
             "copy": {
@@ -113,15 +117,15 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-06-01",
-            "resourceGroup": "[concat(variables('rgName'),copyindex(102))]",
-            "name": "[concat('vmDeployment',copyindex(102))]",
+            "resourceGroup": "[concat(variables('rgName'),copyindex(parameters('copyIndexNumber')))]",
+            "name": "[concat('vmDeployment',copyindex(parameters('copyIndexNumber')))]",
 
             "copy": {
                 "name": "DeploymentCopy",
                 "count": "[parameters('copyCount')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups/', concat(variables('rgName'),copyindex(102)))]"
+                "[resourceId('Microsoft.Resources/resourceGroups/', concat(variables('rgName'),copyindex(parameters('copyIndexNumber'))))]"
             ],
             "properties": {
 
@@ -132,10 +136,11 @@
                     "parameters": {},
                     "variables": {},
                     "resources": [
+                        
                         {
                             "type": "Microsoft.Storage/storageAccounts",
                             "apiVersion": "2018-11-01",
-                            "name": "[concat(parameters('storageAccountName'), copyindex(102))]",
+                            "name": "[concat(parameters('storageAccountName'), copyindex(parameters('copyIndexNumber')))]",
                             "location": "[parameters('location')]",
 
                             "sku": {
@@ -156,12 +161,12 @@
                         {
                             "type": "Microsoft.Network/networkInterfaces",
                             "apiVersion": "2018-11-01",
-                            "name": "[concat(parameters('nicName'), copyindex(102), '_')]",
+                            "name": "[concat(parameters('nicName'), copyindex(parameters('copyIndexNumber')), '_')]",
                             "location": "[parameters('location')]",
                             "properties": {
                                 "ipConfigurations": [
                                     {
-                                        "name": "[concat(parameters('nicName'), copyindex(102), '_', 'IP')]",
+                                        "name": "[concat(parameters('nicName'), copyindex(parameters('copyIndexNumber')), '_', 'IP')]",
                                         "properties": {
                                             "privateIPAllocationMethod": "Dynamic",
                                             "subnet": {
@@ -176,22 +181,24 @@
                         {
                             "type": "Microsoft.Compute/virtualMachines",
                             "apiVersion": "2018-10-01",
-                            "name": "[concat(parameters('dnsLabelPrefix'), copyindex(102))]",
+                            "name": "[concat(parameters('dnsLabelPrefix'), copyindex(parameters('copyIndexNumber')))]",
                             "location": "[parameters('location')]",
-
+                            "dependsOn": [
+                                "[concat(parameters('nicName'), copyindex(parameters('copyIndexNumber')), '_')]"
+                              ],
                             "properties": {
                                 "hardwareProfile": {
                                     "vmSize": "[parameters('vmSize')]"
                                 },
                                 "licenseType": "Windows_Client",
                                 "osProfile": {
-                                    "computerName": "[concat(parameters('dnsLabelPrefix'), copyindex(102))]",
+                                    "computerName": "[concat(parameters('dnsLabelPrefix'), copyindex(parameters('copyIndexNumber')))]",
                                     "adminUsername": "[parameters('adminUsername')]",
                                     "adminPassword": "[parameters('adminPassword')]"
                                 },
                                 "storageProfile": {
                                     "imageReference": {
-                                        "id": "/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/RG-SEC-SIG/providers/Microsoft.Compute/galleries/SECGeneralizedSIG/images/Windows10_Baseline/versions/1.0.0"
+                                       "id": "/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/RG-SEC-SIG/providers/Microsoft.Compute/galleries/SECGeneralizedSIG/images/Windows10_Baseline/versions/1.1.0"
                                     },
                                     "osDisk": {
                                         "ManagedDisk": {
@@ -207,7 +214,7 @@
                             "networkProfile": {
                                 "networkInterfaces": [
                                     {
-                                        "id":"[concat('/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/','RG-',parameters('dnsLabelPrefix'), copyindex(102),'/providers/Microsoft.Network/networkInterfaces/', parameters('nicName'), copyindex(102), '_')]"
+                                        "id":"[concat('/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/','RG-',parameters('dnsLabelPrefix'), copyindex(parameters('copyIndexNumber')),'/providers/Microsoft.Network/networkInterfaces/', parameters('nicName'), copyindex(parameters('copyIndexNumber')), '_')]"
                                     }
                                 ]
                             }
@@ -220,10 +227,10 @@
                 {
                     "type": "Microsoft.Compute/virtualMachines/extensions",
                     "apiVersion": "2019-07-01",
-                    "name": "[concat(parameters('dnsLabelPrefix'),copyindex(102),'/joindomain')]",
+                    "name": "[concat(parameters('dnsLabelPrefix'),copyindex(parameters('copyIndexNumber')),'/joindomain')]",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[concat('Microsoft.Compute/virtualMachines/',parameters('dnsLabelPrefix'), copyindex(102))]"
+                        "[concat('Microsoft.Compute/virtualMachines/',parameters('dnsLabelPrefix'), copyindex(parameters('copyIndexNumber')))]"
                     ],
                     "properties": {
                         "publisher": "Microsoft.Compute",
