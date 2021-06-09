@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "nicName": {
+      "value": "rgdemonic_"
+    },
+  
+    "adminUsername": {
+      "value": "SECLAN001"
+    },
+    "adminPassword": {
+      "value": ""
+    },
+    
+    "vmSize": {
+      "value": "Standard_B2ms"
+    },
+    "location": {
+      "value": "usgovvirginia"
+    },
+    "domainToJoin": {
+      "value": "SEC.Local"
+    },
+    "domainUsername": {
+      "value": ""
+    },
+    "dnsLabelPrefix": {
+      "value": "AZURW4FH11WKCR1"
+    },
+    "domainPassword": {
+      "value": ""
+    },
+    "ouPath": {
+      "value": "OU=Azure,OU=Workstations,OU=ITSB,OU=SEC,DC=SEC,DC=local"
+    },
+    "rgLocation": {
+        "value": "usgovvirginia"
+    },
+    "rgNamePrefix": {
+        "value": "RG-" 
+    },
+    "domainJoinOptions": {
+      "value": 3
+    },
+    "storageAccountName": {
+        "value": "rgdemostor"
+    },
+    "copyCount":{
+      "value": 4
+        }
+    
+    
+  }
+}

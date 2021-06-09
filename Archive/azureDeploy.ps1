@@ -1,0 +1,38 @@
+#Set the template file and template parameter file paths and paste in to Az powershell. Enter the admin password of your choosing for the new VMs, and your domain-join-capable user account and password for automated domain join
+
+
+#Provides Dialog Box to select a file with list of computers.  File must contain only 1 of each of the Computer name(s) per line
+Function Get-OpenFile($initialDirectory)
+{ 
+   [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
+
+$OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+$OpenFileDialog.initialDirectory = $initialDirectory
+$OpenFileDialog.filter = "All files (*.*)| *.*"
+$OpenFileDialog.ShowDialog() | Out-Null
+$OpenFileDialog.filename
+
+}
+
+Write-host "Select Azure Template File"
+
+$templateFile = Get-OpenFile
+
+
+Write-host "Select Azure Template Parameters File"
+
+$templateParams = Get-OpenFile
+
+$credential = Get-Credential -Message "Enter Domain Join Username and Password"
+
+New-AzDeployment `
+-Name DeployToUpdateImage `
+-TemplateFile $templateFile `
+-TemplateParameterFile $templateParams `
+-Location usgovvirginia `
+-dnsLabelPrefix (Read-Host "Enter 15-digit VM Name") `
+-domainUsername $credential.UserName  `
+-adminPassword (ConvertTo-SecureString (Read-Host "Enter Password for Azure VM") -asplaintext -force) `
+-domainPassword $credential.Password `
+-DeploymentDebugLogLevel All `
+-verbose 

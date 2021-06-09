@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "nicName": {
+      "value": "nic_"
+    },
+  
+    "adminUsername": {
+      "value": "SECLAN001"
+    },
+    "adminPassword": {
+      "value": ""
+    },
+    
+    "vmSize": {
+      "value": "Standard_B4ms"
+    },
+    "location": {
+      "value": "usgovvirginia"
+    },
+    "domainToJoin": {
+      "value": "SEC.Local"
+    },
+    "domainUsername": {
+      "value": "svc.azjoin"
+    },
+    "dnsLabelPrefix": {
+      "value": "AZURW4FH11WK"
+    },
+    "domainPassword": {
+      "reference":{
+        "keyVault": {
+          "id": "/subscriptions/1ddb0b36-98c7-49ef-81e7-34e034140f42/resourceGroups/RG-SEC-KV/providers/Microsoft.KeyVault/vaults/SEC-KV"
+        },
+        "secretName": "AZJoin-ServiceAccount-PW"
+      }
+    },
+    "ouPath": {
+      "value": "OU=Developer Workstations,OU=Workstations,OU=AFMIS,OU=SEC,DC=SEC,DC=local"
+    },
+    "rgLocation": {
+        "value": "usgovvirginia"
+    },
+    "rgNamePrefix": {
+        "value": "RG-" 
+    },
+    "domainJoinOptions": {
+      "value": 3
+    },
+    "storageAccountName": {
+        "value": "stor"
+    },
+    "copyCount":{
+      "value": 4
+        },
+    "copyIndexNumber":{
+      "value": ""
+    }    
+  }
+}
