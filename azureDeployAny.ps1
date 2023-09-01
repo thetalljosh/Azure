@@ -118,24 +118,6 @@ if($quit -eq 'q'){exit}
 #execute the command
 iex $command
 
-<#
-New-AzResourceGroupDeployment -ResourceGroupName $rgName `
--Name $deploymentName.replace(" ","-") `
--vmName $vmName
--TemplateFile $templateFile `
--TemplateParameterFile $templateparameterfile `
--existingVirtualNetworkName $existingVirtualNetworkName `
--existingVirtualNetworkResourceGroup $existingVirtualNetworkResourceGroup`
--vmName $vmName `
--windowsOSVersion $windowsOSVersion `
--vmSize $vmSize`
--location $loc`
--domainToJoin $domainToJoin`
--vmSize "Standard_B2s" `
-
-# -whatif
-#>
-
 if ($wif -eq 'y' -and $newrgname){
    write-host "What-if deployment - removing resource group"
    remove-azresourcegroup -name $newrgname -Force
