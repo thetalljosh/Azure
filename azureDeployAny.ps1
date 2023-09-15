@@ -41,15 +41,15 @@ $templateparameterfile = Get-OpenFile
 #$credential = Get-Credential -Message "Enter Domain Join Username and Password"
 
 $newRG = Read-host "Has resource group already been created? [y] yes or [n] no"
-if ($newrg -eq 'y' -or $newRG -eq 'yes') {
+if ($newrg -eq 'y' -or $newRG -eq 'y') {
    $rgName = read-host "Enter existing resource group name"
    if (!(Get-AzResourceGroup -Name $rgName)) {
       write-host "No resource group with that name found - creating resource group in eastus2"
-      New-AzResourceGroup -Name $newrgname -Location 'eastus2'
+      New-AzResourceGroup -Name $rgName -Location 'eastus2'
 
    }
 }
-if ($newrg -eq 'n' -or $newRG -eq 'no') {
+if ($newrg -eq 'n' -or $newRG -eq 'n') {
    $newrgName = read-host "Enter new resource group name"
    $loc = Read-Host "Enter azure region for new resource group [eastus2/centralus]"
    #create the resource group
